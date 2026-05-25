@@ -119,9 +119,10 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (shuffle|play|listen to) [the ](album|ep|record|compilation|single) {media_name}
-            [by [the ](artist|band|group) {artist}] [(in|on|using) [the ]{area_or_player_name}][
-            (with|using) {radio_mode}]
+          - (jouer|joue|diffuse|lire|lit) [l'](album) {media_name} 
+          [(par|de) [la|le|l'][ ](artiste|chanteur|chanteuse|groupe) {artist}] 
+          [(dans|sur) [la|le|l']la|le{area_or_player_name}]
+          [(en|avec) {radio_mode}]
         track_trigger:
           name: Track trigger
           description: The trigger sentences to request a specific track.
@@ -130,8 +131,10 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (shuffle|play|listen to) [the ](track|song) {media_name} [by [the ](artist|band|group)
-            {artist}] [(in|on|using) [the ]{area_or_player_name}][ (with|using) {radio_mode}]
+          - (jouer|joue|diffuse|lire|lit) [la|le][ ](titre|chanson) {media_name}           
+          [(par|de) [la|le|l'][ ](artiste|chanteur|chanteuse|groupe) {artist}] 
+          [(dans|sur) [la|le|l'][ ]{area_or_player_name}]
+          [(en|avec) {radio_mode}]
         artist_trigger:
           name: Artist trigger
           description: The trigger sentences to request music from a specific artist.
@@ -140,8 +143,9 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (shuffle|play|listen to) [the ](artist|band|group) {media_name} [(in|on|using)
-            [the ]{area_or_player_name}][ (with|using) {radio_mode}]
+          - (jouer|joue|diffuse|lire|lit) [la|le|l'][ ](artiste|chanteur|chanteuse|groupe) {media_name} 
+          [(dans|sur) [la|le|l'][ ]{area_or_player_name}]
+          [(en|avec) {radio_mode}]
         audiobook_trigger:
           name: Audiobook trigger
           description: The trigger sentences to request an audiobook.
@@ -150,8 +154,8 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (play|listen to) [the ](book|audio book|audiobook) {media_name} [(in|on|using)
-            [the ]{area_or_player_name}]
+          - (jouer|joue|diffuse|lire|lit) [le|l'][ ](livre|livre audio|audiobook) {media_name} 
+          [(dans|sur) [la|le|l'][ ]{area_or_player_name}]
         radio_trigger:
           name: Radio trigger
           description: The trigger sentences to request a specific radio station.
@@ -160,8 +164,8 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (shuffle|play|listen to) [the ]((radio station)|(radio)|(station)) {media_name}
-            [(in|on|using) [the ]{area_or_player_name}]
+          - (jouer|joue|diffuse|lire|lit) [la ](station|radio) {media_name} 
+          [(dans|sur) [la|le|l'][ ]{area_or_player_name}]
         playlist_trigger:
           name: Playlist trigger
           description: The trigger sentences to request a specific playlist.
@@ -170,8 +174,9 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (shuffle|play|listen to) [the ]playlist {media_name} [(in|on|using) [the ]{area_or_player_name}][
-            (with|using) {radio_mode}]
+          - (jouer|joue|diffuse|lire|lit) [la ](liste|playlist) {media_name} 
+          [(dans|sur) [la|le|l'][ ]{area_or_player_name}]
+          [(en|avec) {radio_mode}]
         response_input:
           name: Response for Assist
           description: The response which will be given by Assist.
@@ -179,9 +184,7 @@ blueprint:
             text:
               multiline: false
               multiple: false
-          default: '{{ ''Shuffling'' if ''shuffle'' in trigger.sentence | lower  else ''''}} {{ trigger.slots.media_name }} 
-            {{ '''' if ''shuffle'' in trigger.sentence | lower else ''playing''}} on {{ mass_player_name
-            }}'
+          default: 'Je joue {{ trigger.slots.media_name }} sur {{ mass_player_name }}'
 triggers:
 - trigger: conversation
   command: !input album_trigger
@@ -205,15 +208,13 @@ actions:
 - alias: Define variables to be used in the automation
   variables:
     version: 20250404
-    shuffle: '{{ ''shuffle'' in trigger.sentence | lower }}'
     default_player_entity_id: !input default_player_entity_id_input
     trigger_id: '{{ trigger.id }}'
     area_or_player_name: '{{ trigger.slots.area_or_player_name | default }}'
     assist_device_id: '{{ trigger.device_id }}'
     action_data:
       media_id: '{{ trigger.slots.media_name }}'
-      media_type: '{{ ''radio'' if ''radio'' in media_name | lower else trigger_id
-        }}'
+      media_type: '{{ ''radio'' if ''radio'' in media_name | lower else trigger_id }}'
       artist: '{{ trigger.slots.artist | default }}'
       radio_mode: '{{ ''radio'' in trigger.slots.radio_mode | default | lower }}'
     ma_players: '{{  integration_entities(''music_assistant'') | select(''match'', ''media_player'') | list }}'
@@ -236,12 +237,6 @@ actions:
 - alias: Send media to selected Music Assistant Player
   action: music_assistant.play_media
   data: '{{ dict(action_data.items() | selectattr(''1'')) }}'
-  target:
-    entity_id: '{{ mass_player_entity_id }}'
-- alias: Enable/Disable shuffle on a Music Assistant Media Player
-  action: media_player.shuffle_set
-  data:
-    shuffle: '{{ shuffle }}'
   target:
     entity_id: '{{ mass_player_entity_id }}'
 - alias: Send back the response

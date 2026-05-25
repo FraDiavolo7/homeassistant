@@ -119,10 +119,10 @@ blueprint:
               multiline: false
               multiple: true
           default:
-          - (jouer|joue|diffuse|lire|lit) [l'](album) {media_name} 
+          - "(jouer|joue|diffuse|lire|lit) [l'](album) {media_name} 
           [(par|de) [la|le|l'][ ](artiste|chanteur|chanteuse|groupe) {artist}] 
           [(dans|sur) [la|le|l']la|le{area_or_player_name}]
-          [(en|avec) {radio_mode}]
+          [(en|avec) {radio_mode}]"
         track_trigger:
           name: Track trigger
           description: The trigger sentences to request a specific track.

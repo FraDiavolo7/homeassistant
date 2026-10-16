@@ -1,0 +1,17 @@
+  alias: clim_start_salon_chauffe_22
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.clim_start
+      data:
+        clim: climate.clim_salon
+        temperature: 22
+        mode_hvac: heat
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.salon_clim_salon_screen_display
+        bip: false
+        entite_bip: switch.clim_salon_prompt_tone
+ 

@@ -1,0 +1,50 @@
+# Une automatisation par clim, basée sur le blueprint clim_midea_auto.
+# À ajouter dans automations.yaml. Adaptez les capteurs de température.
+
+- alias: Clim salon - automatique
+  use_blueprint:
+    path: maison/clim_midea_auto.yaml
+    input:
+      clim: climate.salon_clim_salon
+      temp_interieure: sensor.salon_temperature
+      ext_froid: binary_sensor.exterieur_froid
+      ext_chaud: binary_sensor.exterieur_chaud
+      script_chauffe: script.demarrer_clim_salon_chauffe_22
+      script_froid: script.demarrer_clim_salon_froid_25
+      script_stop: script.arreter_clim_salon
+
+- alias: Clim chambre - automatique
+  use_blueprint:
+    path: maison/clim_midea_auto.yaml
+    input:
+      clim: climate.chambre_clim_chambre
+      temp_interieure: sensor.chambre_temperature
+      ext_froid: binary_sensor.exterieur_froid
+      ext_chaud: binary_sensor.exterieur_chaud
+      script_chauffe: script.demarrer_clim_chambre_chauffe_22
+      script_froid: script.demarrer_clim_chambre_froid_25
+      script_stop: script.arreter_clim_chambre
+
+- alias: Clim bureau - automatique
+  use_blueprint:
+    path: maison/clim_midea_auto.yaml
+    input:
+      clim: climate.bureau_clim_bureau
+      temp_interieure: sensor.bureau_temperature
+      ext_froid: binary_sensor.exterieur_froid
+      ext_chaud: binary_sensor.exterieur_chaud
+      script_chauffe: script.demarrer_clim_bureau_chauffe_22
+      script_froid: script.demarrer_clim_bureau_froid_25
+      script_stop: script.arreter_clim_bureau
+
+- alias: Clim fille - automatique
+  use_blueprint:
+    path: maison/clim_midea_auto.yaml
+    input:
+      clim: climate.fille_clim_fille
+      temp_interieure: sensor.fille_temperature
+      ext_froid: binary_sensor.exterieur_froid
+      ext_chaud: binary_sensor.exterieur_chaud
+      script_chauffe: script.demarrer_clim_fille_chauffe_22
+      script_froid: script.demarrer_clim_fille_froid_25
+      script_stop: script.arreter_clim_fille

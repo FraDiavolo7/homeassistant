@@ -1,0 +1,171 @@
+  alias: clim_start
+  icon: mdi:air-conditioner
+  mode: single
+  description: >
+    Allume la clim avec une température de consigne, un mode, une vitesse
+    de ventilation et des réglages (affichage, bip, oscillation, preset).
+  fields:
+    clim:
+      name: Climatiseur
+      description: Entité climate de la clim Midea
+      required: true
+      example: climate.clim_salon
+      selector:
+        entity:
+          domain: climate
+    temperature:
+      name: Température de consigne
+      required: true
+      default: 22
+      selector:
+        number:
+          min: 16
+          max: 30
+          step: 0.5
+          unit_of_measurement: "°C"
+          mode: box
+    mode_hvac:
+      name: Mode
+      required: true
+      default: cool
+      selector:
+        select:
+          options:
+            - { label: Froid, value: cool }
+            - { label: Chaud, value: heat }
+            - { label: Auto, value: heat_cool }
+            - { label: Déshumidification, value: dry }
+            - { label: Ventilation, value: fan_only }
+    mode_ventilateur:
+      name: Vitesse du ventilateur
+      description: Valeur exacte proposée par votre clim (ex. auto, low, medium, high)
+      required: false
+      default: auto
+      selector:
+        text:
+    oscillation:
+      name: Oscillation
+      description: Valeur exacte proposée par votre clim (ex. off, vertical, horizontal, both)
+      required: false
+      default: "off"
+      selector:
+        text:
+    preset:
+      name: Preset
+      description: Ex. eco, sleep, boost, comfort. Laisser vide pour ne rien changer.
+      required: false
+      default: ""
+      selector:
+        text:
+    affichage:
+      name: Afficheur allumé
+      required: false
+      default: false
+      selector:
+        boolean:
+    entite_affichage:
+      name: Entité interrupteur de l'afficheur
+      required: false
+      example: switch.clim_salon_screen_display
+      selector:
+        entity:
+          domain: switch
+    bip:
+      name: Son (bips) activé
+      required: false
+      default: false
+      selector:
+        boolean:
+    entite_bip:
+      name: Entité interrupteur du son
+      required: false
+      example: switch.clim_salon_prompt_tone
+      selector:
+        entity:
+          domain: switch
+
+  sequence:
+    # 1. Son d'abord : si la clim accepte la commande éteinte, le démarrage
+    #    se fait sans bip. Une erreur ici n'arrête pas le script.
+    - if:
+        - condition: template
+          value_template: "{{ entite_bip is defined and entite_bip | length > 0 }}"
+      then:
+        - action: "switch.turn_{{ 'on' if bip else 'off' }}"
+          target:
+            entity_id: "{{ entite_bip }}"
+          continue_on_error: true
+
+    # 2. Allumer avec le mode choisi
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: "{{ clim }}"
+      data:
+        hvac_mode: "{{ mode_hvac }}"
+    - wait_template: "{{ is_state(clim, mode_hvac) }}"
+      timeout: "00:00:30"
+      continue_on_timeout: true
+    - delay:
+        seconds: "{{ delai | default(3) | int(3) }}"
+ 
+    # 3. Afficheur : tout de suite après le démarrage (l'écran s'allume
+    #    par défaut à la mise en route), pour ne pas réveiller l'occupant.
+    - if:
+        - condition: template
+          value_template: "{{ entite_affichage is defined and entite_affichage | length > 0 }}"
+      then:
+        - action: "switch.turn_{{ 'on' if affichage else 'off' }}"
+          target:
+            entity_id: "{{ entite_affichage }}"
+
+    # 4. Ventilateur
+    - if:
+        - condition: template
+          value_template: "{{ mode_ventilateur is defined and mode_ventilateur | length > 0 }}"
+      then:
+        - action: climate.set_fan_mode
+          target:
+            entity_id: "{{ clim }}"
+          data:
+            fan_mode: "{{ mode_ventilateur }}"
+ 
+    # 5. Oscillation
+    - if:
+        - condition: template
+          value_template: "{{ oscillation is defined and oscillation | length > 0 }}"
+      then:
+        - action: climate.set_swing_mode
+          target:
+            entity_id: "{{ clim }}"
+          data:
+            swing_mode: "{{ oscillation }}"
+ 
+    # 6. Preset (uniquement s'il est renseigné)
+    - if:
+        - condition: template
+          value_template: "{{ preset is defined and preset | length > 0 }}"
+      then:
+        - action: climate.set_preset_mode
+          target:
+            entity_id: "{{ clim }}"
+          data:
+            preset_mode: "{{ preset }}"
+ 
+    # 7. Température de consigne en dernier : la clim la remet à l'ancienne
+    #    valeur peu après le démarrage ou après d'autres commandes. On la
+    #    renvoie jusqu'à ce qu'elle tienne (5 s sans retour en arrière),
+    #    5 essais maximum.
+    - repeat:
+        sequence:
+          - action: climate.set_temperature
+            target:
+              entity_id: "{{ clim }}"
+            data:
+              temperature: "{{ temperature | float }}"
+          - delay: 5
+        until:
+          - condition: template
+            value_template: >
+              {{ state_attr(clim, 'temperature') | float(0) == temperature | float
+                 or repeat.index >= 5 }}
+ 

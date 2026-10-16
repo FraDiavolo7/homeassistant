@@ -1,0 +1,201 @@
+# Blueprint : pilotage automatique d'une clim Midea selon les températures
+# À placer dans : config/blueprints/automation/maison/clim_midea_auto.yaml
+# (le dossier "maison" est libre ; il sert au chemin dans use_blueprint).
+
+blueprint:
+  name: Clim Midea - chauffage / froid automatique
+  description: >
+    Démarre la clim en chauffage ou en froid selon la température extérieure
+    (capteurs binaires "extérieur froid" / "extérieur chaud", vrais depuis
+    1 h) et la température de la pièce, puis l'arrête quand la pièce est
+    revenue dans la plage voulue.
+  domain: automation
+  input:
+    clim:
+      name: Climatiseur
+      selector:
+        entity:
+          domain: climate
+    temp_interieure:
+      name: Température de la pièce
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    ext_froid:
+      name: Capteur binaire "extérieur froid"
+      description: Actif quand la température extérieure est inférieure à 20 °C
+      selector:
+        entity:
+          domain: binary_sensor
+    ext_chaud:
+      name: Capteur binaire "extérieur chaud"
+      description: Actif quand la température extérieure est supérieure à 30 °C
+      selector:
+        entity:
+          domain: binary_sensor
+    script_chauffe:
+      name: Script de démarrage en chauffage
+      selector:
+        entity:
+          domain: script
+    script_froid:
+      name: Script de démarrage en froid
+      selector:
+        entity:
+          domain: script
+    script_stop:
+      name: Script d'arrêt
+      selector:
+        entity:
+          domain: script
+    seuil_chauffe_demarrage:
+      name: Chauffage - démarrer sous (°C)
+      default: 20
+      selector:
+        number:
+          min: 10
+          max: 30
+          step: 0.5
+          mode: box
+    seuil_chauffe_arret:
+      name: Chauffage - arrêter au-dessus de (°C)
+      default: 25
+      selector:
+        number:
+          min: 10
+          max: 35
+          step: 0.5
+          mode: box
+    seuil_froid_demarrage:
+      name: Froid - démarrer au-dessus de (°C)
+      default: 28
+      selector:
+        number:
+          min: 20
+          max: 40
+          step: 0.5
+          mode: box
+    seuil_froid_arret:
+      name: Froid - arrêter sous (°C)
+      default: 24
+      selector:
+        number:
+          min: 15
+          max: 35
+          step: 0.5
+          mode: box
+    delai_demarrage_chauffe:
+      name: Chauffage - durée sous le seuil avant démarrage
+      default:
+        minutes: 10
+      selector:
+        duration:
+    delai_arret:
+      name: Durée avant arrêt (chauffage et froid)
+      default:
+        minutes: 30
+      selector:
+        duration:
+
+mode: single
+max_exceeded: silent
+
+triggers:
+  # --- Chauffage : démarrage ---
+  - trigger: numeric_state
+    id: chauffe_interieur
+    entity_id: !input temp_interieure
+    below: !input seuil_chauffe_demarrage
+    for: !input delai_demarrage_chauffe
+  - trigger: state
+    id: chauffe_exterieur
+    entity_id: !input ext_froid
+    to: "on"
+    for: "01:00:00"
+  # --- Chauffage : arrêt ---
+  - trigger: numeric_state
+    id: chauffe_arret
+    entity_id: !input temp_interieure
+    above: !input seuil_chauffe_arret
+    for: !input delai_arret
+  # --- Froid : démarrage ---
+  - trigger: numeric_state
+    id: froid_interieur
+    entity_id: !input temp_interieure
+    above: !input seuil_froid_demarrage
+  - trigger: state
+    id: froid_exterieur
+    entity_id: !input ext_chaud
+    to: "on"
+    for: "01:00:00"
+  # --- Froid : arrêt ---
+  - trigger: numeric_state
+    id: froid_arret
+    entity_id: !input temp_interieure
+    below: !input seuil_froid_arret
+    for: !input delai_arret
+
+actions:
+  - choose:
+      # Démarrer en chauffage
+      - conditions:
+          - condition: trigger
+            id: [chauffe_interieur, chauffe_exterieur]
+          - condition: state
+            entity_id: !input ext_froid
+            state: "on"
+            for: "01:00:00"
+          - condition: numeric_state
+            entity_id: !input temp_interieure
+            below: !input seuil_chauffe_demarrage
+          - condition: state
+            entity_id: !input clim
+            state: "off"
+        sequence:
+          - action: script.turn_on
+            target:
+              entity_id: !input script_chauffe
+
+      # Arrêter le chauffage (seulement si la clim chauffe)
+      - conditions:
+          - condition: trigger
+            id: chauffe_arret
+          - condition: state
+            entity_id: !input clim
+            state: "heat"
+        sequence:
+          - action: script.turn_on
+            target:
+              entity_id: !input script_stop
+
+      # Démarrer en froid
+      - conditions:
+          - condition: trigger
+            id: [froid_interieur, froid_exterieur]
+          - condition: state
+            entity_id: !input ext_chaud
+            state: "on"
+            for: "01:00:00"
+          - condition: numeric_state
+            entity_id: !input temp_interieure
+            above: !input seuil_froid_demarrage
+          - condition: state
+            entity_id: !input clim
+            state: "off"
+        sequence:
+          - action: script.turn_on
+            target:
+              entity_id: !input script_froid
+
+      # Arrêter le froid (seulement si la clim refroidit)
+      - conditions:
+          - condition: trigger
+            id: froid_arret
+          - condition: state
+            entity_id: !input clim
+            state: "cool"
+        sequence:
+          - action: script.turn_on
+            target:
+              entity_id: !input script_stop

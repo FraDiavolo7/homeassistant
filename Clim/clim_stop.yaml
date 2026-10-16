@@ -1,0 +1,20 @@
+  alias: clim_stop
+  icon: mdi:air-conditioner
+  mode: single
+  description: Éteint la ou les clims Midea sélectionnées.
+  fields:
+    clim:
+      name: Climatiseur(s)
+      description: Entité(s) climate de la ou des clims à arrêter
+      required: true
+      example: climate.salon_clim_salon
+      selector:
+        entity:
+          domain: climate
+          multiple: true
+ 
+  sequence:
+    - action: climate.turn_off
+      target:
+        entity_id: "{{ clim }}"
+ 

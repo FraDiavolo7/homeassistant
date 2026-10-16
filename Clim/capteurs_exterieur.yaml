@@ -1,0 +1,13 @@
+# Capteurs binaires "extérieur froid / chaud" (partagés par les 4 clims).
+# À ajouter dans configuration.yaml (ou dans un fichier inclus), puis
+# recharger les entités template ou redémarrer Home Assistant.
+# Remplacez sensor.temperature_exterieure par votre capteur extérieur.
+
+template:
+  - binary_sensor:
+      - name: Extérieur froid
+        unique_id: exterieur_froid_clim
+        state: "{{ states('sensor.temperature_ext_soye') | float(99) < 20 }}"
+      - name: Extérieur chaud
+        unique_id: exterieur_chaud_clim
+        state: "{{ states('sensor.temperature_ext_soye') | float(0) > 30 }}"

@@ -1,0 +1,7 @@
+  alias: clim_stop_salon
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.clim_stop
+      data:
+        clim: climate.clim_salon

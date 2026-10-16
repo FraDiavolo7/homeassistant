@@ -1,0 +1,182 @@
+# Scripts de raccourci pour les 4 clims (appellent demarrer_clim_midea / arreter_clim_midea).
+# Vérifiez les noms d'entités (climate.*, switch.*) pour chaque pièce.
+
+demarrer_clim_salon_chauffe_22:
+  alias: Clim salon - chauffage 22 °C
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.salon_clim_salon
+        temperature: 22
+        mode_hvac: heat
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.salon_clim_salon_screen_display
+        bip: false
+        entite_bip: switch.salon_clim_salon_prompt_tone
+
+demarrer_clim_salon_froid_25:
+  alias: Clim salon - froid 25 °C
+  icon: mdi:snowflake
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.salon_clim_salon
+        temperature: 25
+        mode_hvac: cool
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.salon_clim_salon_screen_display
+        bip: false
+        entite_bip: switch.salon_clim_salon_prompt_tone
+
+arreter_clim_salon:
+  alias: Arrêter la clim salon
+  icon: mdi:air-conditioner
+  mode: single
+  sequence:
+    - action: script.arreter_clim_midea
+      data:
+        clim: climate.salon_clim_salon
+
+demarrer_clim_chambre_chauffe_22:
+  alias: Clim chambre - chauffage 22 °C
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.chambre_clim_chambre
+        temperature: 22
+        mode_hvac: heat
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.chambre_clim_chambre_screen_display
+        bip: false
+        entite_bip: switch.chambre_clim_chambre_prompt_tone
+
+demarrer_clim_chambre_froid_25:
+  alias: Clim chambre - froid 25 °C
+  icon: mdi:snowflake
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.chambre_clim_chambre
+        temperature: 25
+        mode_hvac: cool
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.chambre_clim_chambre_screen_display
+        bip: false
+        entite_bip: switch.chambre_clim_chambre_prompt_tone
+
+arreter_clim_chambre:
+  alias: Arrêter la clim chambre
+  icon: mdi:air-conditioner
+  mode: single
+  sequence:
+    - action: script.arreter_clim_midea
+      data:
+        clim: climate.chambre_clim_chambre
+
+demarrer_clim_bureau_chauffe_22:
+  alias: Clim bureau - chauffage 22 °C
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.bureau_clim_bureau
+        temperature: 22
+        mode_hvac: heat
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.bureau_clim_bureau_screen_display
+        bip: false
+        entite_bip: switch.bureau_clim_bureau_prompt_tone
+
+demarrer_clim_bureau_froid_25:
+  alias: Clim bureau - froid 25 °C
+  icon: mdi:snowflake
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.bureau_clim_bureau
+        temperature: 25
+        mode_hvac: cool
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.bureau_clim_bureau_screen_display
+        bip: false
+        entite_bip: switch.bureau_clim_bureau_prompt_tone
+
+arreter_clim_bureau:
+  alias: Arrêter la clim bureau
+  icon: mdi:air-conditioner
+  mode: single
+  sequence:
+    - action: script.arreter_clim_midea
+      data:
+        clim: climate.bureau_clim_bureau
+
+demarrer_clim_fille_chauffe_22:
+  alias: Clim fille - chauffage 22 °C
+  icon: mdi:radiator
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.fille_clim_fille
+        temperature: 22
+        mode_hvac: heat
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.fille_clim_fille_screen_display
+        bip: false
+        entite_bip: switch.fille_clim_fille_prompt_tone
+
+demarrer_clim_fille_froid_25:
+  alias: Clim fille - froid 25 °C
+  icon: mdi:snowflake
+  mode: single
+  sequence:
+    - action: script.demarrer_clim_midea
+      data:
+        clim: climate.fille_clim_fille
+        temperature: 25
+        mode_hvac: cool
+        mode_ventilateur: auto
+        oscillation: "off"
+        preset: ""
+        affichage: false
+        entite_affichage: switch.fille_clim_fille_screen_display
+        bip: false
+        entite_bip: switch.fille_clim_fille_prompt_tone
+
+arreter_clim_fille:
+  alias: Arrêter la clim fille
+  icon: mdi:air-conditioner
+  mode: single
+  sequence:
+    - action: script.arreter_clim_midea
+      data:
+        clim: climate.fille_clim_fille
